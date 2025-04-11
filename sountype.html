@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Characteristics Detection</title>
+</head>
+<body>
+    <h1>Speech Characteristics Detector</h1>
+    <button id="startButton">Start Speech Recognition</button>
+    <div id="textOutput"></div>
+    <div id="speechStats"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the browser supports Speech Recognition
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Speech recognition is not supported in this browser.');
+                return;
+            }
+
+            // Initialize speech recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            // Web Audio API setup for pitch and volume detection
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;  // Increase FFT size for better frequency resolution
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            // Variables for speech characteristics
+            let wordStartTime = 0;
+            let wordCount = 0;
+            let lastWordTimestamp = 0;
+
+            // Set up media stream to capture microphone input
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    const sourceNode = audioContext.createMediaStreamSource(stream);
+                    sourceNode.connect(analyser);
+                })
+                .catch(function(err) {
+                    console.error('Error accessing microphone: ', err);
+                });
+
+            // Start button for activating speech recognition
+            const startButton = document.getElementById('startButton');
+            startButton.addEventListener('click', function() {
+                recognition.start();
+                startButton.disabled = true;
+            });
+
+            // Speech recognition result event
+            recognition.onresult = function(event) {
+                const lastResult = event.results[event.results.length - 1];
+                const transcript = lastResult[0].transcript;
+                const confidence = lastResult[0].confidence;
+
+                // Detect speech speed (words per minute)
+                const elapsedTimeSec = (Date.now() - wordStartTime) / 1000;
+                const words = transcript.trim().split(/\s+/);
+                wordCount = words.length;
+                const wordsPerMinute = (wordCount / elapsedTimeSec) * 60;
+
+                // Detect volume (loudness) and pitch (frequency)
+                let volume = detectVolume();
+                let pitch = detectPitch();
+
+                // Display transcribed text and speech characteristics
+                document.getElementById('textOutput').textContent = 'Transcribed Text: ' + transcript;
+                document.getElementById('speechStats').textContent = `
+                    Speech Speed: ${wordsPerMinute.toFixed(2)} WPM
+                    Volume: ${volume}
+                    Pitch: ${pitch}
+                `;
+            };
+
+            // Start speech recognition when recognition starts
+            recognition.onstart = function() {
+                wordStartTime = Date.now();
+            };
+
+            // Error handler
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+            };
+
+            // Detect loudness (volume) using Web Audio API
+            function detectVolume() {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                const average = sum / dataArray.length;
+                const db = 20 * Math.log10(average / 128); // Convert to decibels
+
+                console.log("db", db)
+
+             
+                if (db < -30) {
+                    return 'Soft';
+                } else if (db < -20) {
+                    return 'Normal';
+                } else {
+                    return 'Loud';
+                }
+            }
+
+            // Detect pitch (frequency) using Web Audio API
+            function detectPitch() {
+                analyser.getByteFrequencyData(dataArray);
+                const maxFrequencyIndex = dataArray.indexOf(Math.max(...dataArray));
+                const frequency = maxFrequencyIndex * audioContext.sampleRate / analyser.fftSize;
+
+                // Adjust frequency ranges to improve pitch detection accuracy
+                console.log("freq", frequency)
+                if (frequency < 150) {
+                    return 'Very Low Pitch';
+                } else if (frequency < 300) {
+                    return 'Low Pitch';
+                } else if (frequency < 600) {
+                    return 'Normal Pitch';
+                } else if (frequency < 1200) {
+                    return 'High Pitch';
+                } else {
+                    return 'Very High Pitch';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Speech Analysis with WaveSurfer</title>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div class="flex justify-center items-center bg-[#231f20] h-full w-full overflow-clip">
+        <div class="w-[1280px] h-[667px] relative">
+            <img src="./resources/play.png" alt="bg" class="w-[1280px] h-[667px]">
+            <p class="absolute main text-[32px] top-[4.9rem] left-[14.5rem] text-white">PLAY WITH SOUNDTYPE</p>
+            <div class="">
+                <a href="mic.html"><img src="./resources/mic.gif" class="absolute h-[113.82px] w-[113.82px] top-[11.5rem] left-[1.4rem] opacity-0 hover:opacity-100 transition-opacity duration-200"></a>
+            </div>
+           
+            <div class="">
+                <a href="about.html"><img src="./resources/about.gif" class="absolute h-[113.82px] w-[113.82px] top-[26rem] left-[1.4rem] opacity-0 hover:opacity-100 transition-opacity duration-200"></a>
+            </div>
+            <div class="">
+                <a href="bts.html"><img src="./resources/bts.gif" class="absolute  h-[113.82px] w-[113.82px] top-[33.5rem] left-[1.4rem] opacity-0 hover:opacity-100 transition-opacity duration-200"></a>
+            </div>
+            
+            <div class=" bg-[#231f20] z-[10]">
+                <a href="index.html">
+                <img src="./resources/white.png" class=" z-[10] absolute w-[105.4px] h-[140px] top-[2.3rem] left-[1.6rem]">
+                <img src="./resources/turqoise.png" class="  z-[10] absolute w-[105.4px] h-[140px] top-[2.3rem] left-[1.6rem] opacity-0 hover:opacity-100 transition-opacity duration-200">
+            </a>
+            </div>
+              
+            <div class="container text-white">
+               
+                <div class="text-display absolute border-2 border-white shadow-md shadow-[2px 1px] shadow-[#2bffcd] left-[11.6rem] top-[9rem] w-[470px] h-[290px] p-5 px-30 flex items-center justify-center regular text-wrap overflow-y-auto">
+                    <div id="display-text">Play with SoundType!</div>
+                </div>
+               
+                <div class="controls  text-white flex justify-start">
+                    <div class="control-group rotate-[270deg] absolute left-[34rem] top-[21.5rem]">
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="50" class="slider" id="loudness-slider">
+                        </div>
+
+                    </div>
+                   
+                    <div class="control-group rotate-[270deg] absolute left-[40rem] top-[21.5rem]">
+                        <div class="slider-container ">
+                            <input type="range" min="0" max="100" value="50" class="slider" id="pitch-slider">
+                        </div>
+                       
+                    </div>
+                   
+                    <div class="control-group rotate-[270deg] absolute left-[46rem] top-[21.5rem]">
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="50" class="slider" id="speed-slider">
+                        </div>
+                        
+                    </div>
+                </div>
+               
+                <div class="options absolute top-[28.3rem] left-[12rem] text-white">
+                    <input type="text" id="custom-text" placeholder="Type Text Here.." class="main bg-[#231f20] p-2 mt-1 w-[480px] border-2 border-white">
+                    <div class="button-group mt-2">
+                        <button id="language-toggle" class="main bg-[#231f20] p-2 mt-1 w-[230px] border-2 border-white">Switch to Hindi</button>
+                        <button id="reset-button" class="main bg-[#231f20] p-2 mt-1 w-[234px] ml-3 border-2 border-white">Reset</button>
+                    </div>
+                </div>
+            </div>
+        
+            <script>
+
+        const slider = document.getElementById("loudness-slider");
+
+        function updateSliderBackground(slider) {
+        const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+        slider.style.background = `linear-gradient(to right, #2bffcd ${value}%, #231f20 ${value}%)`;
+        }
+
+        // Initialize
+        updateSliderBackground(slider);
+
+        // Update on input
+        slider.addEventListener("input", function () {
+        updateSliderBackground(this);
+        });
+        const slider2 = document.getElementById("pitch-slider");
+
+        function updateSliderBackground(slider2) {
+        const value = (slider2.value - slider2.min) / (slider2.max - slider2.min) * 100;
+        slider2.style.background = `linear-gradient(to right, #2bffcd ${value}%, #231f20 ${value}%)`;
+        }
+
+        // Initialize
+        updateSliderBackground(slider2);
+
+        // Update on input
+        slider2.addEventListener("input", function () {
+        updateSliderBackground(this);
+        });
+        const slider3 = document.getElementById("speed-slider");
+
+        function updateSliderBackground(slider3) {
+        const value = (slider3.value - slider3.min) / (slider3.max - slider3.min) * 100;
+        slider3.style.background = `linear-gradient(to right, #2bffcd ${value}%, #231f20 ${value}%)`;
+        }
+
+        // Initialize
+        updateSliderBackground(slider3);
+
+        // Update on input
+        slider3.addEventListener("input", function () {
+        updateSliderBackground(this);
+        });
+                // Default text content in both languages
+                const defaultText = {
+                    english: "Play with SoundType!",
+                    hindi: "प्ले विथ साउंडटाइप!"
+                };
+               
+                // Current language state
+                let currentLanguage = "english";
+               
+                // DOM elements
+                const displayText = document.getElementById("display-text");
+                const loudnessSlider = document.getElementById("loudness-slider");
+                const pitchSlider = document.getElementById("pitch-slider");
+                const speedSlider = document.getElementById("speed-slider");
+                const customTextInput = document.getElementById("custom-text");
+                const languageToggle = document.getElementById("language-toggle");
+                const resetButton = document.getElementById("reset-button");
+               
+                // Initialize text
+                let textContent = defaultText.english;
+               
+                // Update text display based on slider values
+                function updateTextDisplay() {
+                    const loudness = parseInt(loudnessSlider.value);
+                    const pitch = parseInt(pitchSlider.value);
+                    const speed = parseInt(speedSlider.value);
+                   
+                    // Loudness transformations
+                    let fontSize = "2rem";
+                    let fontWeight = 400;
+                    let textCase = "none";
+                   
+                    if (loudness < 50) {
+                        // Soft: thinner, smaller, lowercase
+                        const factor = 1 - (50 - loudness) / 50;
+                        fontSize = `${1.5 + 0.5 * factor}rem`;
+                        fontWeight = 300 - (50 - loudness);
+                        textCase = "lowercase";
+                    } else if (loudness > 50) {
+                        // Loud: bolder, bigger, uppercase
+                        const factor = (loudness - 50) / 50;
+                        fontSize = `${2 + 1.5 * factor}rem`;
+                        fontWeight = 400 + (loudness - 50) * 5;
+                        textCase = loudness > 75 ? "uppercase" : "none";
+                    }
+                   
+                    // Apply font weight
+                    displayText.style.fontWeight = fontWeight;
+                   
+                    // Pitch transformations - using transform: scaleX() instead of font-variation-settings
+                    let scaleX = 1; // Normal width
+                   
+                    if (pitch < 50) {
+                        // High pitch: condensed
+                        scaleX = 0.7 + (0.3 * pitch / 50); // Scale from 0.7 to 1
+                    } else if (pitch > 50) {
+                        // Low pitch: expanded
+                        scaleX = 1 + ((pitch - 50) / 50) * 0.5; // Scale from 1 to 1.5
+                    }
+                   
+                    // Speed transformations
+                    let letterSpacing = "normal";
+                    let fontStyle = "normal";
+                    let text = customTextInput.value.trim() ||
+                              (currentLanguage === "english" ? defaultText.english : defaultText.hindi);
+                   
+                    if (speed < 50) {
+                        // Fast: tighter spacing, italicized
+                        const factor = (50 - speed) / 50;
+                        letterSpacing = `${-0.05 * factor}em`;
+                        fontStyle = factor > 0.5 ? "italic" : "normal";
+                    } else if (speed > 50) {
+                        // Slow: wider spacing, periods between words
+                        const factor = (speed - 50) / 50;
+                        letterSpacing = `${0.1 * factor}em`;
+                       
+                        if (factor > 0.5) {
+                            // Add periods between words based on slowness
+                            const dots = ".".repeat(Math.floor(factor * 5));
+                            text = text.split(" ").join(" " + dots + " ");
+                        }
+                    }
+                   
+                    // Apply all transformations
+                    displayText.style.fontSize = fontSize;
+                    displayText.style.transform = `scaleX(${scaleX})`;
+                    displayText.style.textTransform = textCase;
+                    displayText.style.letterSpacing = letterSpacing;
+                    displayText.style.fontStyle = fontStyle;
+                   
+                    // Update the text content
+                    displayText.textContent = text;
+                }
+               
+                // Reset all sliders and text input to default
+                function resetAll() {
+                    loudnessSlider.value = 50;
+                    pitchSlider.value = 50;
+                    speedSlider.value = 50;
+                    customTextInput.value = "";
+                   
+                    // Reset text display styles
+                    displayText.style.fontSize = "2rem";
+                    displayText.style.fontWeight = 400;
+                    displayText.style.transform = "scaleX(1)";
+                    displayText.style.textTransform = "none";
+                    displayText.style.letterSpacing = "normal";
+                    displayText.style.fontStyle = "normal";
+                   
+                    // Reset text content to default based on current language
+                    displayText.textContent = currentLanguage === "english" ? defaultText.english : defaultText.hindi;
+                }
+               
+                // Event listeners
+                loudnessSlider.addEventListener("input", updateTextDisplay);
+                pitchSlider.addEventListener("input", updateTextDisplay);
+                speedSlider.addEventListener("input", updateTextDisplay);
+               
+                customTextInput.addEventListener("input", updateTextDisplay);
+               
+                resetButton.addEventListener("click", resetAll);
+               
+                languageToggle.addEventListener("click", () => {
+                    if (currentLanguage === "english") {
+                        currentLanguage = "hindi";
+                        languageToggle.textContent = "Switch to English";
+                        if (!customTextInput.value.trim()) {
+                            displayText.textContent = defaultText.hindi;
+                        }
+                    } else {
+                        currentLanguage = "english";
+                        languageToggle.textContent = "Switch to Hindi";
+                        if (!customTextInput.value.trim()) {
+                            displayText.textContent = defaultText.english;
+                        }
+                    }
+                    updateTextDisplay();
+                });
+               
+                // Initial call to set up display
+                updateTextDisplay();
+            </script>
+    
+    </body>
+
+</html>
