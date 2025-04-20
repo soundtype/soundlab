@@ -5,6 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Speech Analysis with WaveSurfer</title>
         <link rel="stylesheet" href="index.css">
+        <style>
+          #scroll {
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+          }
+        </style>
     </head>
     <body>
         <div class="flex justify-center items-center bg-[#231f20] h-full w-full ">
@@ -26,12 +32,18 @@
                 <img src="./resources/turqoise.png" class="  z-[10] absolute w-[105.4px] h-[140px] top-[2.3rem] left-[1.6rem] opacity-0 hover:opacity-100 transition-opacity duration-200">
             </a>
             </div>
-            <div class="absolute top-[4rem] left-[12rem] overflow-y-auto h-[590px] scrollbar-hidden">
+            <img src="./resources/scroll.png" id="scroll" class="absolute top-[12rem] right-[-14rem] z-[40] scale-[0.2]">
+
+            <div class="absolute top-[4rem] left-[12rem] overflow-y-auto h-[590px] scrollbar-hidden" onscroll="hideScroll()">
+
                 <div class=" w-[100%]">
                     <img src="./resources/about.png" class="w-[885.76px] h-[466.16px]">
+
+
+                   
                     <div class="pt-[10rem] relative h-fit">
                         <img src="./resources/about-12.png" class="w-[940.76px] h-[350.16px]">
-                                                    
+
                         <div class="slider absolute top-[11.3rem] left-[1.3rem]">
                             <div class="slide_viewer">
                             <div class="slide_group">
@@ -246,6 +258,30 @@
 
 		  advance();
 		});
+
+    const scrollHint = document.getElementById("scroll");
+    const scrollContainer = document.querySelector(".overflow-y-auto");
+
+    let fadeTimeout;
+
+    scrollContainer.addEventListener("scroll", () => {
+        if (fadeTimeout) clearTimeout(fadeTimeout);
+
+        if (scrollContainer.scrollTop === 0) {
+            scrollHint.style.display = "block";
+            scrollHint.style.opacity = "1";
+          
+            return
+        }
+
+        scrollHint.style.opacity = "0"; 
+        fadeTimeout = setTimeout(() => {
+            scrollHint.style.display = "none"; 
+        }, 600); 
+
+       
+    });
+   
 </script>
     </body>
 </html>
