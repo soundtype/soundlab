@@ -45,7 +45,7 @@
                    
                     <div class="control-group rotate-[270deg] absolute left-[40rem] top-[21.5rem]">
                         <div class="slider-container ">
-                            <input type="range" min="0" max="100" value="50" class="slider" id="pitch-slider">
+                            <input type="range" min="-100" max="0" value="-50" class="slider" id="pitch-slider">
                         </div>
                        
                     </div>
@@ -86,7 +86,7 @@
         const slider2 = document.getElementById("pitch-slider");
 
         function updateSliderBackground(slider2) {
-        const value = (slider2.value - slider2.min) / (slider2.max - slider2.min) * 100;
+        const value = -((slider2.value - slider2.min) / (slider2.max - slider2.min) * 100);
         slider2.style.background = `linear-gradient(to right, #2bffcd ${value}%, #231f20 ${value}%)`;
         }
 
@@ -135,7 +135,7 @@
                 // Update text display based on slider values
                 function updateTextDisplay() {
                     const loudness = parseInt(loudnessSlider.value);
-                    const pitch = parseInt(pitchSlider.value);
+                    const pitch = -parseInt(pitchSlider.value);
                     const speed = parseInt(speedSlider.value);
                    
                     // Loudness transformations
